@@ -1,0 +1,5 @@
+{
+  "@@locale": "en_US",
+  "daysLeft": "{quantity, plural, one{Pozostał 1 dzień} other{Pozostało {formattedNumber} dni}}",
+  "week": "tydzień"
+}
