@@ -21,8 +21,6 @@ class MessageLookup extends MessageLookupByLibrary {
 
   static m0(quantity, formattedNumber) => "${Intl.plural(quantity, one: 'Pozostał 1 dzień', other: 'Pozostało ${formattedNumber} dni')}";
 
-  static m0(quantity, formattedNumber) => "${Intl.plural(quantity, one: 'Pozostał 1 dzień', other: 'Pozostało ${formattedNumber} dni')}";
-
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
     "daysLeft" : m0,

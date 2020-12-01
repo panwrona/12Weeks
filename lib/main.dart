@@ -23,6 +23,7 @@ class MyApp extends StatelessWidget {
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
+          S.delegate
         ],
         supportedLocales: S.delegate.supportedLocales
     );
