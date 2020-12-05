@@ -66,7 +66,7 @@ class _CreateScreenState extends State<CreateScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(state.startDate.toString() ?? 'Brak daty'),
+                  Text(state.startDate == null ? 'Brak daty' : state.startDate.toString()),
                   RaisedButton(
                       child: Text('Wybierz startowa date'),
                       onPressed: () => _selectStartDate(context))
@@ -75,7 +75,7 @@ class _CreateScreenState extends State<CreateScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(state.endDate.toString() ?? 'Brak daty'),
+                  Text(state.endDate == null ? 'Brak daty' : state.endDate.toString()),
                   RaisedButton(
                       child: Text('Wybierz startowa date'),
                       onPressed: () => _selectEndDate(context))
