@@ -19,7 +19,7 @@ class MainState extends State<Main> {
       'Index 1: Calendar',
       style: optionStyle,
     ),
-    CreateScreen(),
+    CreateScreenContainer(),
     Text(
       'Index 3: Progress',
       style: optionStyle,
@@ -48,7 +48,7 @@ class MainState extends State<Main> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Theme(
-              data: Theme.of(context).copyWith(canvasColor: Colors.transparent),
+              data: Theme.of(context).copyWith(canvasColor: Colors.black),
               child: BottomNavigationBar(
                 elevation: 0.0,
                 items: const <BottomNavigationBarItem>[
