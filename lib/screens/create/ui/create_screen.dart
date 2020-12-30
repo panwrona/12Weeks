@@ -13,7 +13,6 @@ class CreateScreen extends StatefulWidget {
 
 class _CreateScreenState extends State<CreateScreen> {
   DateTime _startDate;
-  DateTime _endDate;
   CreateProjectBloc _bloc;
 
   @override
@@ -42,17 +41,6 @@ class _CreateScreenState extends State<CreateScreen> {
     }
   }
 
-  Future<void> _selectEndDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: _endDate ?? DateTime.now(),
-        firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != _endDate) {
-      this._bloc.add(EndDateCreateEvent(picked));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,16 +57,8 @@ class _CreateScreenState extends State<CreateScreen> {
                   Text(state.startDate == null ? 'Brak daty' : state.startDate.toString()),
                   RaisedButton(
                       child: Text('Wybierz startowa date'),
-                      onPressed: () => _selectStartDate(context))
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(state.endDate == null ? 'Brak daty' : state.endDate.toString()),
-                  RaisedButton(
-                      child: Text('Wybierz startowa date'),
-                      onPressed: () => _selectEndDate(context))
+                      onPressed: () => _selectStartDate(context)),
+                  Text(state.endDate == null ? 'Brak daty' : state.endDate.toString())
                 ],
               )
             ],

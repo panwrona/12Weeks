@@ -17,8 +17,7 @@ class CreateProjectBloc extends Bloc<CreateEvent, CreateState> {
   Stream<CreateState> mapEventToState(CreateEvent event) async* {
     if(event is StartDateCreateEvent) {
       _startDate = event.date;
-    } else if (event is EndDateCreateEvent) {
-      _endDate = event.date;
+      _endDate = event.date.add(Duration(days: 84));
     }
     yield CreateState(startDate: _startDate, endDate: _endDate);
   }
