@@ -18,6 +18,7 @@ class CreateProjectBloc extends Bloc<CreateEvent, CreateState> {
     if(event is StartDateCreateEvent) {
       _startDate = event.date;
       _endDate = event.date.add(Duration(days: 84));
+      _projectRepository.setProjectDates(_startDate, _endDate);
     }
     yield CreateState(startDate: _startDate, endDate: _endDate);
   }

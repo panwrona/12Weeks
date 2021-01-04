@@ -1,11 +1,11 @@
 
 import 'package:flutter/cupertino.dart';
-import 'package:twelve_weeks/repostitory/project/model/db_project.dart';
 import 'package:twelve_weeks/repostitory/project/model/project.dart';
 import 'package:twelve_weeks/repostitory/project/project_data_source.dart';
 
 class ProjectRepository {
   ProjectDataSource dataSource;
+  Project temporaryProject;
 
   ProjectRepository({
     @required this.dataSource
@@ -21,6 +21,10 @@ class ProjectRepository {
 
   Future<void> saveProject(Project project) {
 
+  }
+
+  setProjectDates(DateTime startDate, DateTime endDate) {
+      temporaryProject = Project(startDate, endDate);
   }
 
 }

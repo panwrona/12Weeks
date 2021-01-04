@@ -127,7 +127,7 @@ class _CreateScreenState extends State<CreateScreen> {
     return state.startDate != null && state.endDate != null;
   }
 
-  void _goToNextPage() {
+  void _goToNextPage(DateTime dateTime) {
     controller.animateToPage(_nextPage, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
   }
 
@@ -156,7 +156,7 @@ class _CreateScreenState extends State<CreateScreen> {
                     RaisedButton(
                       child: Text('Przejdz dalej'),
                       onPressed: _isStartDateAndEndDateChosen(state)
-                          ? () => _goToNextPage()
+                          ? () => _goToNextPage(state.startDate)
                           : null,
                     )
                   ],
