@@ -1,26 +1,26 @@
 
 import 'package:bloc/bloc.dart';
 import 'package:twelve_weeks/repostitory/project/project_repository.dart';
+import 'package:twelve_weeks/screens/create/bloc/dates/set_dates_event.dart';
 
-import 'create_event.dart';
-import 'create_state.dart';
+import 'set_dates_state.dart';
 
-class CreateProjectBloc extends Bloc<CreateEvent, CreateState> {
+class SetDatesBloc extends Bloc<SetDatesEvent, SetDatesState> {
 
   final ProjectRepository _projectRepository;
   DateTime _startDate;
   DateTime _endDate;
 
-  CreateProjectBloc(this._projectRepository) : super(CreateState());
+  SetDatesBloc(this._projectRepository) : super(SetDatesState());
 
   @override
-  Stream<CreateState> mapEventToState(CreateEvent event) async* {
+  Stream<SetDatesState> mapEventToState(SetDatesEvent event) async* {
     if(event is StartDateCreateEvent) {
       _startDate = event.date;
       _endDate = event.date.add(Duration(days: 84));
       _projectRepository.setProjectDates(_startDate, _endDate);
     }
-    yield CreateState(startDate: _startDate, endDate: _endDate);
+    yield SetDatesState(startDate: _startDate, endDate: _endDate);
   }
 
 }
