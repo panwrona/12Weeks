@@ -5,7 +5,9 @@ import 'package:twelve_weeks/repostitory/project/project_data_source.dart';
 
 class ProjectRepository {
   ProjectDataSource dataSource;
-  Project temporaryProject;
+  List<String> goals = List();
+  DateTime _startDate;
+  DateTime _endDate;
 
   ProjectRepository({
     @required this.dataSource
@@ -24,7 +26,19 @@ class ProjectRepository {
   }
 
   setProjectDates(DateTime startDate, DateTime endDate) {
-      temporaryProject = Project(startDate, endDate);
+      _startDate = startDate;
+      _endDate = endDate;
   }
 
+  bool hasGoal(String goal) {
+    return goals.contains(goal);
+  }
+
+  addGoal(String goal) {
+    goals.add(goal);
+  }
+
+  removeGoal(String goal) {
+    goals.remove(goal);
+  }
 }
