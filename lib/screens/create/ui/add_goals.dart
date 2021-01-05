@@ -22,6 +22,7 @@ class _AddGoalsState extends State<AddGoalsScreen> {
 
   final addGoalController = TextEditingController();
   final nextPage = 2;
+  final GlobalKey<FormState> _formKey = GlobalKey();
   PageController controller;
   AddGoalsBloc _bloc;
 
@@ -51,23 +52,28 @@ class _AddGoalsState extends State<AddGoalsScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                      width: 100,
-                      child: TextFormField(
-                        controller: addGoalController,
+                    Form(
+                      key: _formKey,
+                      child: Container(
+                        width: 200,
+                        child: TextFormField(
+                          controller: addGoalController,
+                          validator: (value) =>
+                              value.isNotEmpty ? null : 'Goal cannot be blank',
+                        ),
                       ),
                     ),
                     RaisedButton(
                         child: Text('Dodaj cel'),
-                        onPressed: _isTextFieldEmpty() ? null : _addGoal())
+                        onPressed: () => {
+                              if (_formKey.currentState != null &&
+                                  _formKey.currentState.validate())
+                                {_addGoal()}
+                            }),
                   ],
                 ),
               );
             }));
-  }
-
-  bool _isTextFieldEmpty() {
-    return addGoalController.text.isNotEmpty;
   }
 
   _addGoal() {
