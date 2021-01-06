@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,7 +24,6 @@ class _AddGoalsState extends State<AddGoalsScreen> {
 
   final addGoalController = TextEditingController();
   final nextPage = 2;
-  final GlobalKey<FormState> _formKey = GlobalKey();
   PageController controller;
   AddGoalsBloc _bloc;
 
@@ -39,6 +40,7 @@ class _AddGoalsState extends State<AddGoalsScreen> {
   void dispose() {
     addGoalController.dispose();
     _bloc.close();
+    _bloc.dispose();
     super.dispose();
   }
 
@@ -52,31 +54,48 @@ class _AddGoalsState extends State<AddGoalsScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Form(
-                      key: _formKey,
-                      child: Container(
-                        width: 200,
-                        child: TextFormField(
-                          controller: addGoalController,
-                          validator: (value) =>
-                              value.isNotEmpty ? null : 'Goal cannot be blank',
-                        ),
-                      ),
-                    ),
-                    RaisedButton(
-                        child: Text('Dodaj cel'),
-                        onPressed: () => {
-                              if (_formKey.currentState != null &&
-                                  _formKey.currentState.validate())
-                                {_addGoal()}
-                            }),
+                    buildGoalEditText(this._bloc),
+                    buildButton(this._bloc)
                   ],
                 ),
               );
             }));
   }
 
-  _addGoal() {
-    this._bloc.add(AddGoal(addGoalController.text));
+  Widget buildGoalEditText(AddGoalsBloc bloc) {
+    return StreamBuilder<Object>(
+        stream: bloc.getGoal,
+        builder: (context, snapshot) {
+          return Container(
+            width: 200,
+            child: TextFormField(
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                errorText: snapshot.error,
+              ),
+              onChanged: bloc.changeGoal,
+            ),
+          );
+        }
+    );
+  }
+
+  Widget buildButton(AddGoalsBloc bloc) {
+    return StreamBuilder <String>(
+        stream: bloc.getGoal,
+        builder: (context, snapshot) {
+          return RaisedButton(
+              child: Text('Dodaj cel'),
+              onPressed:
+              (!snapshot.hasData)
+                  ? null
+                  : () => { _addGoal(snapshot.data) }
+          );
+        });
+  }
+
+  _addGoal(String text) {
+    this._bloc.add(AddGoal(text));
   }
 }
