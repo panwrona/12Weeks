@@ -1,37 +1,22 @@
-
 import 'dart:async';
-
-import 'package:bloc/bloc.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:twelve_weeks/repostitory/project/project_repository.dart';
-import 'add_goals_state.dart';
 
-import 'add_goals_event.dart';
-
-class AddGoalsBloc extends Bloc<AddGoalsEvent, AddGoalsState> {
+class AddGoalsBloc {
   final _goalStream = StreamController<String>.broadcast();
+  BehaviorSubject<List<String>> _goalsListStream;
 
   final ProjectRepository _projectRepository;
 
-  AddGoalsBloc(this._projectRepository) : super(Loading());
-
-  @override
-  Stream<AddGoalsState> mapEventToState(AddGoalsEvent event) async* {
-    if(event is AddGoal) {
-      if(_projectRepository.hasGoal(event.goal)) {
-        yield AlreadyOnTheList();
-      } else {
-        _projectRepository.addGoal(event.goal);
-        yield UpdatedList(_projectRepository.goals);
-      }
-    } else if (event is RemoveGoal) {
-      _projectRepository.removeGoal(event.goal);
-      yield UpdatedList(_projectRepository.goals);
-    }
+  AddGoalsBloc(this._projectRepository) {
+    _goalsListStream = BehaviorSubject<List<String>>.seeded(_projectRepository.getGoalsList());
   }
 
   Function(String) get changeGoal => _goalStream.sink.add;
 
   Stream<String> get getGoal => _goalStream.stream.transform(_goalValidator);
+
+  Stream<List<String>> get getGoalsList => _goalsListStream.stream;
 
   final _goalValidator = StreamTransformer<String,String>.fromHandlers(
       handleData: (goal,sink) {
@@ -44,7 +29,22 @@ class AddGoalsBloc extends Bloc<AddGoalsEvent, AddGoalsState> {
       }
   );
 
+  addGoal(String goal) {
+    if(_projectRepository.hasGoal(goal)) {
+      _goalsListStream.sink.addError('Goal is already on the list!');
+    } else {
+      _projectRepository.addGoal(goal);
+      _goalsListStream.sink.add(_projectRepository.getGoalsList());
+    }
+  }
+
+  removeGoal(String goal) {
+    _projectRepository.removeGoal(goal);
+    _goalsListStream.sink.add(_projectRepository.getGoalsList());
+  }
+
   dispose() {
+    _goalsListStream.close();
     _goalStream.close();
   }
 

@@ -1,12 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:twelve_weeks/repostitory/project/project_repository.dart';
 import 'package:twelve_weeks/screens/create/bloc/goals/add_goals_bloc.dart';
 import 'package:twelve_weeks/screens/create/bloc/goals/add_goals_event.dart';
-import 'package:twelve_weeks/screens/create/bloc/goals/add_goals_state.dart';
 
 class AddGoalsScreen extends StatefulWidget {
   const AddGoalsScreen({@required this.controller, Key key}) : super(key: key);
@@ -22,7 +19,6 @@ class AddGoalsScreen extends StatefulWidget {
 class _AddGoalsState extends State<AddGoalsScreen> {
   _AddGoalsState({@required this.controller}) : super();
 
-  final addGoalController = TextEditingController();
   final nextPage = 2;
   PageController controller;
   AddGoalsBloc _bloc;
@@ -38,8 +34,6 @@ class _AddGoalsState extends State<AddGoalsScreen> {
 
   @override
   void dispose() {
-    addGoalController.dispose();
-    _bloc.close();
     _bloc.dispose();
     super.dispose();
   }
@@ -47,19 +41,22 @@ class _AddGoalsState extends State<AddGoalsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: BlocBuilder<AddGoalsBloc, AddGoalsState>(
-            cubit: this._bloc,
-            builder: (context, state) {
-              return SafeArea(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    buildGoalEditText(this._bloc),
-                    buildButton(this._bloc)
-                  ],
-                ),
-              );
-            }));
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [buildGoalEditText(this._bloc), buildButton(this._bloc)],
+              ),
+            ),
+            SizedBox(height: 20),
+            buildGoalsList(this._bloc)
+          ],
+        ),
+      ),
+    );
   }
 
   Widget buildGoalEditText(AddGoalsBloc bloc) {
@@ -71,31 +68,67 @@ class _AddGoalsState extends State<AddGoalsScreen> {
             child: TextFormField(
               keyboardType: TextInputType.text,
               decoration: InputDecoration(
-                labelText: 'Password',
+                labelText: 'Goal',
                 errorText: snapshot.error,
               ),
               onChanged: bloc.changeGoal,
             ),
           );
-        }
-    );
+        });
   }
 
   Widget buildButton(AddGoalsBloc bloc) {
-    return StreamBuilder <String>(
+    return StreamBuilder<String>(
         stream: bloc.getGoal,
         builder: (context, snapshot) {
           return RaisedButton(
               child: Text('Dodaj cel'),
               onPressed:
-              (!snapshot.hasData)
-                  ? null
-                  : () => { _addGoal(snapshot.data) }
-          );
+                  (!snapshot.hasData) ? null : () => {_addGoal(snapshot.data)});
         });
   }
 
+  Widget buildGoalsList(AddGoalsBloc bloc) {
+    return StreamBuilder<List<String>>(
+      stream: bloc.getGoalsList,
+      builder: (context, snapshot) {
+        return (snapshot.data == null || snapshot.data.isEmpty) ? Text('No items yet') : Flexible(child: ListView(children: [goalCard(snapshot.data, bloc)]));
+      }
+    );
+  }
+
+  Widget goalCard(List<String> goals, AddGoalsBloc bloc) {
+    return Card(
+        margin: EdgeInsets.only(left: 16.0, right: 16.0),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var text in goals)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        '$text',
+                      ),
+                      Spacer(),
+                      GestureDetector(
+                        onTap: () => bloc.removeGoal(text), // handle your image tap here
+                        child: Icon(
+                          Icons.remove_circle
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ));
+  }
+
   _addGoal(String text) {
-    this._bloc.add(AddGoal(text));
+    this._bloc.addGoal(text);
   }
 }
