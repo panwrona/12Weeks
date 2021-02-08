@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:twelve_weeks/repostitory/project/project_repository.dart';
 import 'package:twelve_weeks/screens/create/bloc/goals/add_goals_bloc.dart';
-import 'package:twelve_weeks/screens/create/bloc/goals/add_goals_event.dart';
 
 class AddGoalsScreen extends StatefulWidget {
   const AddGoalsScreen({@required this.controller, Key key}) : super(key: key);
@@ -21,6 +20,7 @@ class _AddGoalsState extends State<AddGoalsScreen> {
 
   final nextPage = 2;
   PageController controller;
+  final _goalEditingController = TextEditingController();
   AddGoalsBloc _bloc;
 
   @override
@@ -48,7 +48,10 @@ class _AddGoalsState extends State<AddGoalsScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [buildGoalEditText(this._bloc), buildButton(this._bloc)],
+                children: [
+                  buildGoalEditText(this._bloc),
+                  buildAddGoalButton(this._bloc)
+                ],
               ),
             ),
             SizedBox(height: 20),
@@ -67,6 +70,7 @@ class _AddGoalsState extends State<AddGoalsScreen> {
             width: 200,
             child: TextFormField(
               keyboardType: TextInputType.text,
+              controller: _goalEditingController,
               decoration: InputDecoration(
                 labelText: 'Goal',
                 errorText: snapshot.error,
@@ -77,23 +81,46 @@ class _AddGoalsState extends State<AddGoalsScreen> {
         });
   }
 
-  Widget buildButton(AddGoalsBloc bloc) {
+  Widget buildAddGoalButton(AddGoalsBloc bloc) {
     return StreamBuilder<String>(
         stream: bloc.getGoal,
         builder: (context, snapshot) {
           return RaisedButton(
               child: Text('Dodaj cel'),
               onPressed:
-                  (!snapshot.hasData) ? null : () => {_addGoal(snapshot.data)});
+              (!snapshot.hasData) ? null : () => {
+                _goalEditingController.clear(),
+                _addGoal(snapshot.data)
+              });
         });
   }
 
   Widget buildGoalsList(AddGoalsBloc bloc) {
     return StreamBuilder<List<String>>(
-      stream: bloc.getGoalsList,
-      builder: (context, snapshot) {
-        return (snapshot.data == null || snapshot.data.isEmpty) ? Text('No items yet') : Flexible(child: ListView(children: [goalCard(snapshot.data, bloc)]));
-      }
+        stream: bloc.getGoalsList,
+        builder: (context, snapshot) {
+          return (snapshot.data == null || snapshot.data.isEmpty) ? Text(
+              'No items yet') :
+          Flexible(
+              child: ListView(
+                  children: [
+                    goalCard(snapshot.data, bloc),
+                    buildNextButton()
+                  ]
+              )
+          );
+        }
+    );
+  }
+
+  Widget buildNextButton() {
+    return Center(
+      child: RaisedButton(
+        child: Text('Krok 3/3'),
+        onPressed: () => {
+          controller.animateToPage(nextPage, duration: Duration(milliseconds: 300), curve: Curves.easeInOut)
+        }
+      ),
     );
   }
 
@@ -115,9 +142,10 @@ class _AddGoalsState extends State<AddGoalsScreen> {
                       ),
                       Spacer(),
                       GestureDetector(
-                        onTap: () => bloc.removeGoal(text), // handle your image tap here
+                        onTap: () => bloc.removeGoal(text),
+                        // handle your image tap here
                         child: Icon(
-                          Icons.remove_circle
+                            Icons.remove_circle
                         ),
                       )
                     ],
