@@ -79,6 +79,7 @@ class _AddGoalsState extends State<AddGoalsScreen> {
             ),
           );
         });
+
   }
 
   Widget buildAddGoalButton(AddGoalsBloc bloc) {
