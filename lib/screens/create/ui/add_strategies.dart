@@ -36,6 +36,7 @@ class _AddStrategiesState extends State<AddStrategiesScreen> {
       child: Stack(
           alignment: AlignmentDirectional.center, children: [_listOfGoals()]),
     );
+
   }
 
   Widget _listOfGoals() {
