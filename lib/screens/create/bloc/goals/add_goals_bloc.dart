@@ -1,55 +1,59 @@
-import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:twelve_weeks/repostitory/project/project_repository.dart';
 
 class AddGoalsBloc extends ChangeNotifier {
-  final _goalStream = StreamController<String>.broadcast();
-  BehaviorSubject<List<String>> _goalsListStream;
 
   ProjectRepository _projectRepository;
 
   set projectRepository(ProjectRepository repository) {
     _projectRepository = repository;
-    _goalsListStream = BehaviorSubject<List<String>>.seeded(_projectRepository.getGoalsList());
     notifyListeners();
   }
 
-  Function(String) get changeGoal => _goalStream.sink.add;
+  GoalValidation _goalValidation = GoalValidation(null, null);
+  GoalsList _goalsList = GoalsList([], null);
 
-  Stream<String> get getGoal => _goalStream.stream.transform(_goalValidator);
+  validateGoal(String goal) {
+    if(goal.isNotEmpty) {
+      _goalValidation = GoalValidation(goal, null);
+    } else {
+      _goalValidation = GoalValidation(null, 'Goal is empty!');
+    }
+    notifyListeners();
+  }
+  
+  GoalValidation get goalValidation => _goalValidation;
 
-  Stream<List<String>> get getGoalsList => _goalsListStream.stream;
-
-  final _goalValidator = StreamTransformer<String,String>.fromHandlers(
-      handleData: (goal,sink) {
-        if(goal.isNotEmpty){
-          sink.add(goal);
-        }
-        else{
-          sink.addError('Goal is empty!');
-        }
-      }
-  );
+  GoalsList get goalsList => _goalsList;
 
   addGoal(String goal) {
     if(_projectRepository.hasGoal(goal)) {
-      _goalsListStream.sink.addError('Goal is already on the list!');
+      _goalsList = GoalsList(_projectRepository.getGoalsList(), 'Goal is already on the list!');
     } else {
       _projectRepository.addGoal(goal);
-      _goalsListStream.sink.add(_projectRepository.getGoalsList());
+      _goalsList = GoalsList(_projectRepository.getGoalsList(), null);
     }
+    notifyListeners();
   }
 
   removeGoal(String goal) {
     _projectRepository.removeGoal(goal);
-    _goalsListStream.sink.add(_projectRepository.getGoalsList());
+    notifyListeners();
   }
 
-  dispose() {
-    _goalsListStream.close();
-    _goalStream.close();
-  }
+}
 
+class GoalValidation {
+  final String goal;
+  final String error;
+
+  GoalValidation(this.goal, this.error);
+}
+
+class GoalsList {
+  final List<String> goals;
+  final String error;
+  
+  GoalsList(this.goals, this.error);
 }

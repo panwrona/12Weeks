@@ -23,12 +23,6 @@ class _AddGoalsState extends State<AddGoalsScreen> {
   AddGoalsBloc _bloc;
 
   @override
-  void dispose() {
-    _bloc.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     _bloc = context.watch<AddGoalsBloc>();
     return Scaffold(
@@ -54,65 +48,50 @@ class _AddGoalsState extends State<AddGoalsScreen> {
   }
 
   Widget buildGoalEditText(AddGoalsBloc bloc) {
-    return StreamBuilder<Object>(
-        stream: bloc.getGoal,
-        builder: (context, snapshot) {
-          return Container(
-            width: 200,
-            child: TextFormField(
-              keyboardType: TextInputType.text,
-              controller: _goalEditingController,
-              decoration: InputDecoration(
-                labelText: 'Goal',
-                errorText: snapshot.error,
-              ),
-              onChanged: bloc.changeGoal,
-            ),
-          );
-        });
-
+    return Container(
+      width: 200,
+      child: TextFormField(
+        keyboardType: TextInputType.text,
+        controller: _goalEditingController,
+        decoration: InputDecoration(
+          labelText: 'Goal',
+          errorText: bloc.goalValidation.error,
+        ),
+        onChanged: (text) => bloc.validateGoal(text),
+      ),
+    );
   }
 
   Widget buildAddGoalButton(AddGoalsBloc bloc) {
-    return StreamBuilder<String>(
-        stream: bloc.getGoal,
-        builder: (context, snapshot) {
-          return ElevatedButton(
-              child: Text('Dodaj cel'),
-              onPressed:
-              (!snapshot.hasData) ? null : () => {
-                _goalEditingController.clear(),
-                _addGoal(snapshot.data)
-              });
-        });
+    return ElevatedButton(
+        child: Text('Dodaj cel'),
+        onPressed: (bloc.goalValidation.goal == null)
+            ? null
+            : () => {
+                  _goalEditingController.clear(),
+                  _addGoal(bloc.goalValidation.goal)
+                });
   }
 
   Widget buildGoalsList(AddGoalsBloc bloc) {
-    return StreamBuilder<List<String>>(
-        stream: bloc.getGoalsList,
-        builder: (context, snapshot) {
-          return (snapshot.data == null || snapshot.data.isEmpty) ? Text(
-              'No items yet') :
-          Flexible(
-              child: ListView(
-                  children: [
-                    goalCard(snapshot.data, bloc),
-                    buildNextButton()
-                  ]
-              )
-          );
-        }
-    );
+    return (bloc.goalsList.goals == null || bloc.goalsList.goals.isEmpty)
+        ? Text('No items yet')
+        : Flexible(
+            child: ListView(children: [
+            goalCard(bloc.goalsList.goals, bloc),
+            buildNextButton()
+          ]));
   }
 
   Widget buildNextButton() {
     return Center(
       child: ElevatedButton(
-        child: Text('Krok 3/3'),
-        onPressed: () => {
-          controller.animateToPage(nextPage, duration: Duration(milliseconds: 300), curve: Curves.easeInOut)
-        }
-      ),
+          child: Text('Krok 3/3'),
+          onPressed: () => {
+                controller.animateToPage(nextPage,
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut)
+              }),
     );
   }
 
@@ -136,9 +115,7 @@ class _AddGoalsState extends State<AddGoalsScreen> {
                       GestureDetector(
                         onTap: () => bloc.removeGoal(text),
                         // handle your image tap here
-                        child: Icon(
-                            Icons.remove_circle
-                        ),
+                        child: Icon(Icons.remove_circle),
                       )
                     ],
                   ),
