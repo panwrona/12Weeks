@@ -1,15 +1,19 @@
 import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:twelve_weeks/repostitory/project/project_repository.dart';
 
-class AddGoalsBloc {
+class AddGoalsBloc extends ChangeNotifier {
   final _goalStream = StreamController<String>.broadcast();
   BehaviorSubject<List<String>> _goalsListStream;
 
-  final ProjectRepository _projectRepository;
+  ProjectRepository _projectRepository;
 
-  AddGoalsBloc(this._projectRepository) {
+  set projectRepository(ProjectRepository repository) {
+    _projectRepository = repository;
     _goalsListStream = BehaviorSubject<List<String>>.seeded(_projectRepository.getGoalsList());
+    notifyListeners();
   }
 
   Function(String) get changeGoal => _goalStream.sink.add;

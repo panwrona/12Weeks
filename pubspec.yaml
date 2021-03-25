@@ -23,15 +23,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  bloc: ^6.0.0
-  flutter_bloc: ^6.0.0
   flutter_localizations:
     sdk: flutter
-  intl: ^0.16.1
-  intl_translation: ^0.17.0
+  intl: 0.17.0
+  intl_translation:
+    git:
+      url: https://github.com/nt4f04uNd/intl_translation
   hive: ^1.4.4+1
   hive_flutter: ^0.3.1
   rxdart: 0.25.0
+  provider: ^5.0.0
 
 
   # The following adds the Cupertino Icons font to your application.

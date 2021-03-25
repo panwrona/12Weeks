@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:twelve_weeks/repostitory/project/project_repository.dart';
+import 'package:provider/provider.dart';
 import 'package:twelve_weeks/screens/create/bloc/goals/add_goals_bloc.dart';
 
 class AddGoalsScreen extends StatefulWidget {
@@ -24,15 +23,6 @@ class _AddGoalsState extends State<AddGoalsScreen> {
   AddGoalsBloc _bloc;
 
   @override
-  void didChangeDependencies() {
-    if (this._bloc == null) {
-      final userRepository = RepositoryProvider.of<ProjectRepository>(context);
-      this._bloc = AddGoalsBloc(userRepository);
-    }
-    super.didChangeDependencies();
-  }
-
-  @override
   void dispose() {
     _bloc.dispose();
     super.dispose();
@@ -40,6 +30,7 @@ class _AddGoalsState extends State<AddGoalsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _bloc = context.watch<AddGoalsBloc>();
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -86,7 +77,7 @@ class _AddGoalsState extends State<AddGoalsScreen> {
     return StreamBuilder<String>(
         stream: bloc.getGoal,
         builder: (context, snapshot) {
-          return RaisedButton(
+          return ElevatedButton(
               child: Text('Dodaj cel'),
               onPressed:
               (!snapshot.hasData) ? null : () => {
@@ -116,7 +107,7 @@ class _AddGoalsState extends State<AddGoalsScreen> {
 
   Widget buildNextButton() {
     return Center(
-      child: RaisedButton(
+      child: ElevatedButton(
         child: Text('Krok 3/3'),
         onPressed: () => {
           controller.animateToPage(nextPage, duration: Duration(milliseconds: 300), curve: Curves.easeInOut)

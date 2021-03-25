@@ -1,26 +1,25 @@
-
-import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:twelve_weeks/repostitory/project/project_repository.dart';
-import 'package:twelve_weeks/screens/create/bloc/dates/set_dates_event.dart';
 
-import 'set_dates_state.dart';
+class SetDatesBloc extends ChangeNotifier {
 
-class SetDatesBloc extends Bloc<SetDatesEvent, SetDatesState> {
-
-  final ProjectRepository _projectRepository;
+  ProjectRepository _projectRepository;
   DateTime _startDate;
   DateTime _endDate;
 
-  SetDatesBloc(this._projectRepository) : super(SetDatesState());
-
-  @override
-  Stream<SetDatesState> mapEventToState(SetDatesEvent event) async* {
-    if(event is StartDateCreateEvent) {
-      _startDate = event.date;
-      _endDate = event.date.add(Duration(days: 84));
-      _projectRepository.setProjectDates(_startDate, _endDate);
-    }
-    yield SetDatesState(startDate: _startDate, endDate: _endDate);
+  set projectRepository(ProjectRepository repository) {
+    _projectRepository = repository;
+    notifyListeners();
   }
 
+  void setStartDate(DateTime startDate) {
+    _startDate = startDate;
+    _endDate = _startDate.add(Duration(days: 84));
+    _projectRepository.setProjectDates(_startDate, _endDate);
+    notifyListeners();
+  }
+
+  DateTime get startDate => _startDate;
+
+  DateTime get endDate => _endDate;
 }

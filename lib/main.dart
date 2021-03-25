@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:twelve_weeks/repostitory/project/model/db_project.dart';
 import 'package:twelve_weeks/repostitory/project/project_data_source.dart';
 import 'package:twelve_weeks/repostitory/project/project_repository.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:twelve_weeks/screens/create/bloc/dates/set_dates_bloc.dart';
+import 'package:twelve_weeks/screens/create/bloc/goals/add_goals_bloc.dart';
+import 'package:twelve_weeks/screens/create/bloc/strategies/add_strategies_bloc.dart';
 import 'package:twelve_weeks/screens/main/main.dart';
 
 import 'generated/l10n.dart';
@@ -23,14 +26,35 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiRepositoryProvider(
+    return MultiProvider(
         providers: [
-          RepositoryProvider<ProjectRepository>(
+          Provider<ProjectRepository>(
             create: (_) => ProjectRepository(
-              dataSource: ProjectDataSource(
-                this.projectBox
-              )
-            ),
+                dataSource: ProjectDataSource(this.projectBox)),
+          ),
+          ChangeNotifierProxyProvider<ProjectRepository, SetDatesBloc>(
+              create: (context) => SetDatesBloc(),
+              update: (context, repository, bloc) {
+                if(bloc == null) throw ArgumentError.notNull('bloc');
+                bloc.projectRepository = repository;
+                return bloc;
+              }
+          ),
+          ChangeNotifierProxyProvider<ProjectRepository, AddGoalsBloc>(
+              create: (context) => AddGoalsBloc(),
+              update: (context, repository, bloc) {
+                if(bloc == null) throw ArgumentError.notNull('bloc');
+                bloc.projectRepository = repository;
+                return bloc;
+              }
+          ),
+          ChangeNotifierProxyProvider<ProjectRepository, AddStrategiesBloc>(
+              create: (context) => AddStrategiesBloc(),
+              update: (context, repository, bloc) {
+                if(bloc == null) throw ArgumentError.notNull('bloc');
+                bloc.projectRepository = repository;
+                return bloc;
+              }
           )
         ],
         child: MaterialApp(
@@ -50,5 +74,3 @@ class MyApp extends StatelessWidget {
             supportedLocales: S.delegate.supportedLocales));
   }
 }
-
-
